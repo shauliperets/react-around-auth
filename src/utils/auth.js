@@ -4,23 +4,12 @@ export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: {
-      //Accept: "application/json",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ email, password }),
   })
     .then((response) => {
-      //console.log("register response ==>" + response);
-
       return response.json();
-      /*
-      try {
-        if (response.status === 200) {
-          return response.json();
-        }
-      } catch (exception) {
-        return exception;
-      }*/
     })
     .catch((error) => console.log(error));
 };
@@ -30,6 +19,7 @@ export const login = (email, password) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": BASE_URL,
     },
     body: JSON.stringify({ email, password }),
   })
@@ -44,17 +34,15 @@ export const login = (email, password) => {
       } else {
         return;
       }
-    }); //continue from here - store to local
+    });
 };
 
 export const getContent = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
-      //Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-  }); //.then((response) => response.json());
-  //.then((data) => data);
+  });
 };

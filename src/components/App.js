@@ -31,14 +31,11 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [tooltipOn, setTooltipOn] = React.useState(false);
-
-  //const [source, setSource] = React.useState("");
+  const [tooltipMessage, setTooltipMessage] = React.useState("");
+  const [isAuthorized, setIsAuthorized] = React.useState(false);
+  const [headerEmail, setHeaderEmail] = React.useState("");
 
   let history = useHistory();
-
-  /*React.useEffect(() => {
-    tokenCheck();
-  });*/
 
   React.useEffect(() => {
     tokenCheck();
@@ -205,84 +202,86 @@ function App() {
     });
   }
 
-  function handleRegisterSubmit(email, password) {
-    //console.log(`email = ${email}, password = ${password}`);
-    //console.log("register result =>", register(email, password));
+  function handleTooltipClose() {
+    setTooltipOn(false);
+  }
 
-    register(email, password).then((data) => {
-      console.log("register data =>", data);
-      //setSource("register");
-      setTooltipOn(true);
-    });
+  function handleRegisterSubmit(email, password) {
+    register(email, password)
+      .then((data) => {
+        if (typeof data.error === "undefined") {
+          setIsAuthorized(true);
+          setTooltipMessage("Success! You have now been registered");
+          history.push("/signin");
+        } else {
+          setIsAuthorized(false);
+          setTooltipMessage(data.error);
+        }
+        setTooltipOn(true);
+      })
+      .catch((error) => {
+        console.log("An error occurred: ", error);
+      });
   }
 
   function handleLoginSubmit(email, password) {
-    //console.log(`email = ${email}, password = ${password}`);
-    //console.log("register result =>", register(email, password));
-
-    login(email, password).then((data) => {
-      console.log("register data =>", data);
-      setTooltipOn(true);
-      //setSource("login");
-    });
+    login(email, password)
+      .then((data) => {
+        setIsAuthorized(true);
+        setTooltipMessage("Success! You are now login");
+        setTooltipOn(true);
+        setLoggedIn(true);
+        setHeaderEmail(email);
+        history.push("/");
+      })
+      .catch((error) => {
+        console.log("An error occurred: ", error);
+      });
   }
 
   function tokenCheck() {
     const token = localStorage.getItem("token");
 
-    //console.log("tokenCheck =>", token);
-    //console.log("loggedIn =>", loggedIn);
-
     if (token) {
       getContent(token).then((response) => {
         if (response) {
-          //console.log("getContent if response", response);
+          console.log("getContent if response", response);
 
           setLoggedIn(true);
 
-          //console.log("source =>", source);
-
           history.push("/");
-
-          /*if (source == "register") {
-            history.push("/register");
-          } else if (source === "login") {
-            history.push("/login");
-          } else if (source === "") {
-            history.push("/");
-          }*/
-
-          /*setLoggedIn(
-            {
-              loggedIn: true,
-            } ,
-            () => {
-              history.push("/");
-            }
-          );*/
         }
-        //
-        /*(else {
-          console.log("getContent else");
-          history.push("/signin");
-        }*/
       });
     }
+  }
+
+  function redirectRegister() {
+    history.push("/signup");
+  }
+
+  function redirectLogin() {
+    history.push("/signin");
+  }
+
+  function logout() {
+    history.push("/signin");
+    setHeaderEmail("");
   }
 
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-        <Header />
-
         <Switch>
           <Route path="/signin">
+            <Header linkText="Sign up" email={headerEmail} handleClick={redirectRegister} />
             <Login handleSubmit={handleLoginSubmit}></Login>
           </Route>
           <Route path="/signup">
+            <Header linkText="Sign in" email={headerEmail} handleClick={redirectLogin} />
             <Register handleSubmit={handleRegisterSubmit}></Register>
           </Route>
           <ProtectedRoute path="/" loggedIn={loggedIn}>
+            <Header linkText="Log out" email={headerEmail} handleClick={logout} />
             <Main
               onEditProfileClick={handleEditProfileClick}
               onAddPlaceClick={handleAddPlaceClick}
@@ -325,8 +324,9 @@ function App() {
 
         <InfoTooltip
           isOpen={tooltipOn}
-          image={authorizedImage}
-          title="Success! You have now been registered."
+          image={isAuthorized ? authorizedImage : unauthorizedImage}
+          title={tooltipMessage}
+          onClose={handleTooltipClose}
         ></InfoTooltip>
       </CurrentUserContext.Provider>
     </div>
