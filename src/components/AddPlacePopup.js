@@ -39,7 +39,7 @@ function AddPlacePopup(props) {
         minLength="1"
         maxLength="30"
         value={title || ""}
-        onChange={(event) => updateTitle(event)}
+        onChange={updateTitle}
       />
       <div id="popup_title_error" className="popup__input-error"></div>
       <input
@@ -48,7 +48,7 @@ function AddPlacePopup(props) {
         placeholder="Image link"
         type="url"
         value={link || ""}
-        onChange={(event) => updateLink(event)}
+        onChange={updateLink}
         required
       />
       <div id="popup_link_error" className="popup__input-error"></div>

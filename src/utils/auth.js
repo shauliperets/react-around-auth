@@ -7,11 +7,9 @@ export const register = (email, password) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ email, password }),
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => console.log(error));
+  }).then((response) => {
+    return _checkResponse(response);
+  });
 };
 
 export const login = (email, password) => {
@@ -24,10 +22,9 @@ export const login = (email, password) => {
     body: JSON.stringify({ email, password }),
   })
     .then((response) => {
-      return response.json();
+      return _checkResponse(response);
     })
     .then((data) => {
-      console.log("login jwt data =>", data.token);
       if (data.token) {
         localStorage.setItem("token", data.token);
         return data;
@@ -37,12 +34,20 @@ export const login = (email, password) => {
     });
 };
 
-export const getContent = (token) => {
+export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+  }).then((response) => {
+    return _checkResponse(response);
   });
 };
+
+function _checkResponse(response) {
+  if (response.ok) return response.json();
+
+  return Promise.reject(`Error: ${response.status}`);
+}

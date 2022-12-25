@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Register(props) {
   const [email, setEmail] = React.useState("");
@@ -27,27 +28,19 @@ function Register(props) {
         }}
       >
         <label className="register__header">Sign up</label>
-        <input
-          type="text"
-          placeholder="Email"
-          className="register__input"
-          onChange={(event) => {
-            updateEmail(event);
-          }}
-        ></input>
+        <input type="text" placeholder="Email" className="register__input" onChange={updateEmail} value={email}></input>
         <input
           type="password"
           placeholder="Password"
           className="register__input"
-          onChange={(event) => {
-            updatePassword(event);
-          }}
+          onChange={updatePassword}
+          value={password}
         ></input>
         <button className="register__button" type="submit">
           Sign up
         </button>
         <label className="register__redirect">
-          Already a member? Log in <a href="/signin">here!</a>
+          Already a member? Log in <Link to="/signin">here!</Link>
         </label>
       </form>
     </div>

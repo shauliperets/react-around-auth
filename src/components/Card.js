@@ -20,7 +20,7 @@ function Card(props) {
           props.onDeleteCard(props.id);
         }}
       >
-        <img src={binIcon} alt="" />
+        <img src={binIcon} alt="Delete card" />
       </button>
       <img src={props.link} alt={props.title} className="card__image" onClick={props.onCardClick} />
       <div className="card__title-panel">

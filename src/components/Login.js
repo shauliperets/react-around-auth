@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Login(props) {
   const [email, setEmail] = React.useState("");
@@ -32,16 +33,18 @@ function Login(props) {
           placeholder="Email"
           className="login__input"
           onChange={(event) => updateEmail(event)}
+          value={email}
         ></input>
         <input
           type="password"
           placeholder="Password"
           className="login__input"
-          onChange={(event) => updatePassword(event)}
+          onChange={updatePassword}
+          value={password}
         ></input>
         <button className="login__button">Log in</button>
         <label className="login__redirect">
-          Not a member yet? Sign up <a href="/signup">here!</a>
+          Not a member yet? Sign up <Link to="/signup">here!</Link>
         </label>
       </form>
     </div>

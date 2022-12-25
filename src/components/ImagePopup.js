@@ -8,7 +8,11 @@ function ImagePopup(props) {
             type="button"
             onClick={props.onClose}
           ></button>
-          <img src={props.card.src} alt="" className="popup__image popup__image_type_float-image" />
+          <img
+            src={props.card.src}
+            alt="Image selected card popup"
+            className="popup__image popup__image_type_float-image"
+          />
         </div>
         <div className="popup__image-description">{props.card.alt}</div>
       </div>

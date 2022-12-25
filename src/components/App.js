@@ -18,7 +18,7 @@ import { Route, Switch } from "react-router-dom";
 import InfoTooltip from "./InfoTooltip";
 import authorizedImage from "../images/authorized.svg";
 import unauthorizedImage from "../images/unauthorized.svg";
-import { register, login, getContent } from "../utils/auth";
+import { register, login, checkToken } from "../utils/auth";
 
 function App() {
   const [cards, setCards] = React.useState([]);
@@ -35,7 +35,7 @@ function App() {
   const [isAuthorized, setIsAuthorized] = React.useState(false);
   const [headerEmail, setHeaderEmail] = React.useState("");
 
-  let history = useHistory();
+  const history = useHistory();
 
   React.useEffect(() => {
     tokenCheck();
@@ -149,6 +149,18 @@ function App() {
     setIsImagePopupOpen(false);
   }
 
+  React.useEffect(() => {
+    const closeByEscape = (e) => {
+      if (e.key === "Escape") {
+        closeAllPopups();
+      }
+    };
+
+    document.addEventListener("keydown", closeByEscape);
+
+    return () => document.removeEventListener("keydown", closeByEscape);
+  }, []);
+
   const handleLikeClick = (card) => {
     api
       .addRemoveLike(card._id, isLiked(card.likes, currentUser._id))
@@ -217,11 +229,13 @@ function App() {
           setIsAuthorized(false);
           setTooltipMessage(data.error);
         }
-        setTooltipOn(true);
       })
       .catch((error) => {
         console.log("An error occurred: ", error);
-      });
+        setIsAuthorized(false);
+        setTooltipMessage(error);
+      })
+      .finally(setTooltipOn(true));
   }
 
   function handleLoginSubmit(email, password) {
@@ -243,15 +257,17 @@ function App() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      getContent(token).then((response) => {
-        if (response) {
-          console.log("getContent if response", response);
-
-          setLoggedIn(true);
-
-          history.push("/");
-        }
-      });
+      checkToken(token)
+        .then((response) => {
+          if (response) {
+            setLoggedIn(true);
+            setHeaderEmail(response.data.email);
+            history.push("/");
+          }
+        })
+        .catch((error) => {
+          console.log("An error occurred: ", error);
+        });
     }
   }
 
@@ -304,21 +320,21 @@ function App() {
           onClose={closeAllPopups}
           onSubmit={handleCreateCardSubmit}
           button={isLoading ? "Saving..." : "Save"}
-        ></AddPlacePopup>
+        />
 
         <EditProfilePopup
           isOpen={isEditProfileOpen}
           onClose={closeAllPopups}
           onSubmit={handleEditProfileSubmit}
           button={isLoading ? "Saving..." : "Save"}
-        ></EditProfilePopup>
+        />
 
         <EditAvatarPopup
           isOpen={isEditAvatarOpen}
           onClose={closeAllPopups}
           button={isLoading ? "Saving..." : "Save"}
           onSubmit={handleEditAvatarSubmit}
-        ></EditAvatarPopup>
+        />
 
         <ImagePopup isOpen={isImagePopupOpen} card={selectedCard} onClose={closeAllPopups}></ImagePopup>
 
